@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Divisor de Gastos",
+    "slug": "divisor-gastos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios", "android"],
+    "splash": {
+      "backgroundColor": "#0F766E",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.divisorgastos.app"
+    },
+    "android": {
+      "package": "com.divisorgastos.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0F766E"
+      }
+    }
+  }
+}
