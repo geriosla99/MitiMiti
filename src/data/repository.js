@@ -9,12 +9,6 @@ import { execute, query } from './database';
 
 // ───── Grupos ─────────────────────────────────────────────────────────────
 
-/**
- * Crea un grupo y sus participantes en una sola transacción lógica.
- * @param {string} name             nombre del viaje/salida
- * @param {string[]} participantNames lista de nombres
- * @returns {Promise<number>} id del grupo creado
- */
 export async function createGroup(name, participantNames) {
   const cleanName = (name ?? '').trim();
   if (!cleanName) throw new Error('El nombre del grupo es obligatorio.');
@@ -29,7 +23,6 @@ export async function createGroup(name, participantNames) {
     'INSERT INTO groups (name) VALUES (?);',
     [cleanName]
   );
-  // Compatibilidad: algunas versiones devuelven lastInsertRowId, otras insertId.
   const groupId = result?.lastInsertRowId ?? result?.insertId;
   if (!groupId) throw new Error('No se pudo crear el grupo.');
 
@@ -42,12 +35,6 @@ export async function createGroup(name, participantNames) {
   return groupId;
 }
 
-/**
- * Lista todos los grupos junto con un par de campos calculados:
- *  - participant_count
- *  - total_spent
- * Útil para la pantalla principal.
- */
 export async function listGroups() {
   return query(`
     SELECT
@@ -67,7 +54,6 @@ export async function getGroup(groupId) {
 }
 
 export async function deleteGroup(groupId) {
-  // ON DELETE CASCADE se encarga de participantes y gastos.
   await execute('DELETE FROM groups WHERE id = ?;', [groupId]);
 }
 
@@ -115,9 +101,6 @@ export async function deleteExpense(id) {
   await execute('DELETE FROM expenses WHERE id = ?;', [id]);
 }
 
-/**
- * Lista los gastos del grupo, incluyendo el nombre del pagador (JOIN).
- */
 export async function listExpenses(groupId) {
   return query(
     `SELECT
@@ -133,5 +116,20 @@ export async function listExpenses(groupId) {
      WHERE e.group_id = ?
      ORDER BY e.created_at DESC, e.id DESC;`,
     [groupId]
+  );
+}
+
+// ───── Preferencias clave/valor ───────────────────────────────────────────
+
+export async function getSetting(key) {
+  const rows = await query('SELECT value FROM app_settings WHERE key = ?;', [key]);
+  return rows[0]?.value ?? null;
+}
+
+export async function setSetting(key, value) {
+  await execute(
+    `INSERT INTO app_settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value;`,
+    [key, String(value)]
   );
 }

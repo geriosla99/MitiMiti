@@ -22,7 +22,7 @@ import {
 import Button from '../components/Button';
 import ParticipantInputList from '../components/ParticipantInputList';
 import { createGroup } from '../data/repository';
-import { colors, spacing, radius, typography } from '../theme';
+import { colors, spacing, radius, typography, shadow } from '../theme';
 
 export default function CreateGroupScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -41,7 +41,6 @@ export default function CreateGroupScreen({ navigation }) {
       Alert.alert('Falta información', 'Agrega al menos 2 participantes.');
       return;
     }
-    // Detectamos duplicados ignorando mayúsculas/acentos básicos.
     const lower = cleanedParticipants.map((p) => p.toLowerCase());
     const hasDuplicates = new Set(lower).size !== lower.length;
     if (hasDuplicates) {
@@ -62,13 +61,21 @@ export default function CreateGroupScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.heroBanner}>
+          <Text style={styles.heroEmoji}>🧳</Text>
+          <Text style={styles.heroTitle}>Empieza un nuevo viaje</Text>
+          <Text style={styles.heroSubtitle}>
+            Ponle un nombre y agrega a las personas que comparten gastos.
+          </Text>
+        </View>
+
         <Text style={styles.label}>Nombre del viaje</Text>
         <TextInput
           value={name}
@@ -81,7 +88,7 @@ export default function CreateGroupScreen({ navigation }) {
 
         <Text style={[styles.label, { marginTop: spacing.lg }]}>Participantes</Text>
         <Text style={styles.help}>
-          Agrega a todas las personas que comparten los gastos.
+          Mínimo 2 personas. Puedes agregar todas las que quieras.
         </Text>
         <ParticipantInputList
           participants={participants}
@@ -100,16 +107,33 @@ export default function CreateGroupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { padding: spacing.lg, paddingBottom: spacing.xxxl },
+  heroBanner: {
+    backgroundColor: colors.primarySofter,
+    borderRadius: radius.xl,
     padding: spacing.lg,
-    paddingBottom: spacing.xxl,
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    ...shadow.card,
+  },
+  heroEmoji: { fontSize: 40, lineHeight: 52, marginBottom: spacing.xs },
+  heroTitle: {
+    ...typography.subtitle,
+    color: colors.primaryDark,
+    fontSize: 18,
+  },
+  heroSubtitle: {
+    ...typography.caption,
+    color: colors.primaryDeep,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.md,
   },
   label: {
     ...typography.label,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   help: {
     ...typography.caption,
@@ -120,9 +144,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     fontSize: 15,
     color: colors.textPrimary,
   },

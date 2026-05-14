@@ -7,8 +7,12 @@
  *   GroupDetail       → gastos del grupo + acceso al resumen
  *   AddExpense        → formulario de gasto (crea o edita)
  *   Summary           → resumen final con balances y deudas
+ *
+ * `onOpenTutorial` se propaga a la pantalla principal, que muestra un
+ * botón "?" en el header para reabrir el onboarding.
  */
 import React from 'react';
+import { Pressable, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -17,7 +21,7 @@ import CreateGroupScreen from '../screens/CreateGroupScreen';
 import GroupDetailScreen from '../screens/GroupDetailScreen';
 import AddExpenseScreen from '../screens/AddExpenseScreen';
 import SummaryScreen from '../screens/SummaryScreen';
-import { colors } from '../theme';
+import { colors, spacing } from '../theme';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,15 +33,27 @@ const screenOptions = {
   contentStyle: { backgroundColor: colors.background },
 };
 
-export default function AppNavigator() {
+export default function AppNavigator({ onOpenTutorial }) {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Groups" screenOptions={screenOptions}>
         <Stack.Screen
           name="Groups"
-          component={GroupListScreen}
-          options={{ title: 'Mis viajes' }}
-        />
+          options={{
+            title: 'Mis viajes',
+            headerRight: () => (
+              <Pressable
+                onPress={onOpenTutorial}
+                hitSlop={12}
+                style={({ pressed }) => [styles.helpBtn, pressed && { opacity: 0.7 }]}
+              >
+                <Text style={styles.helpBtnText}>?</Text>
+              </Pressable>
+            ),
+          }}
+        >
+          {(props) => <GroupListScreen {...props} onOpenTutorial={onOpenTutorial} />}
+        </Stack.Screen>
         <Stack.Screen
           name="CreateGroup"
           component={CreateGroupScreen}
@@ -64,3 +80,21 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  helpBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginRight: spacing.xs,
+  },
+  helpBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 16,
+    lineHeight: 18,
+  },
+});

@@ -5,9 +5,7 @@
  * - Tap en un grupo  → abre el detalle.
  * - Long-press        → ofrece eliminarlo.
  * - FAB inferior     → crea un grupo nuevo.
- *
- * Usamos useFocusEffect para refrescar la lista cada vez que la pantalla
- * vuelve al frente (por ejemplo, después de crear o borrar un grupo).
+ * - Header "?"       → reabre el tutorial.
  */
 import React, { useCallback, useState } from 'react';
 import {
@@ -26,7 +24,7 @@ import GroupCard from '../components/GroupCard';
 import { listGroups, deleteGroup } from '../data/repository';
 import { colors, spacing, radius, typography, shadow } from '../theme';
 
-export default function GroupListScreen({ navigation }) {
+export default function GroupListScreen({ navigation, onOpenTutorial }) {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +39,6 @@ export default function GroupListScreen({ navigation }) {
     }
   }, []);
 
-  // Recarga cada vez que la pantalla recibe foco.
   useFocusEffect(
     useCallback(() => {
       load();
@@ -51,7 +48,7 @@ export default function GroupListScreen({ navigation }) {
   const confirmDelete = (group) => {
     Alert.alert(
       'Eliminar viaje',
-      `¿Seguro que quieres eliminar "${group.name}"? Se borrarán también sus gastos.`,
+      'Seguro que quieres eliminar "' + group.name + '"? Se borrarán también sus gastos.',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -89,25 +86,52 @@ export default function GroupListScreen({ navigation }) {
           />
         )}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={load} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={load}
+            tintColor={colors.primary}
+          />
+        }
+        ListHeaderComponent={
+          groups.length > 0 ? (
+            <Text style={styles.sectionLabel}>
+              {groups.length} viaje{groups.length === 1 ? '' : 's'} guardado{groups.length === 1 ? '' : 's'}
+            </Text>
+          ) : null
         }
         ListEmptyComponent={
           !loading && (
             <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>Aún no tienes viajes</Text>
+              <Text style={styles.emptyEmoji}>🌴</Text>
+              <Text style={styles.emptyTitle}>Aún no hay viajes</Text>
               <Text style={styles.emptyText}>
-                Crea tu primer grupo para empezar a registrar gastos.
+                Toca el botón verde abajo para crear tu primer grupo y comenzar a registrar gastos compartidos.
               </Text>
+              {onOpenTutorial && (
+                <Pressable
+                  onPress={onOpenTutorial}
+                  style={({ pressed }) => [
+                    styles.emptyTutorialBtn,
+                    pressed && { opacity: 0.7 },
+                  ]}
+                >
+                  <Text style={styles.emptyTutorialText}>📖 Ver tutorial otra vez</Text>
+                </Pressable>
+              )}
             </View>
           )
         }
       />
 
       <Pressable
-        style={({ pressed }) => [styles.fab, pressed && { opacity: 0.85 }]}
+        style={({ pressed }) => [
+          styles.fab,
+          pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] },
+        ]}
         onPress={() => navigation.navigate('CreateGroup')}
       >
-        <Text style={styles.fabText}>+ Nuevo viaje</Text>
+        <Text style={styles.fabPlus}>+</Text>
+        <Text style={styles.fabText}>Nuevo viaje</Text>
       </Pressable>
     </SafeAreaView>
   );
@@ -117,17 +141,26 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   list: {
     padding: spacing.lg,
-    paddingBottom: 100, // espacio para el FAB
+    paddingBottom: 110,
     flexGrow: 1,
+  },
+  sectionLabel: {
+    ...typography.micro,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
   },
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 80,
+    paddingTop: 60,
+    paddingHorizontal: spacing.xl,
   },
+  emptyEmoji: { fontSize: 72, lineHeight: 88, marginBottom: spacing.lg },
   emptyTitle: {
-    ...typography.subtitle,
+    ...typography.title,
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
@@ -135,7 +168,18 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: spacing.xl,
+    lineHeight: 22,
+  },
+  emptyTutorialBtn: {
+    marginTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySofter,
+  },
+  emptyTutorialText: {
+    ...typography.bodyStrong,
+    color: colors.primaryDark,
   },
   fab: {
     position: 'absolute',
@@ -145,12 +189,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingVertical: spacing.md,
     borderRadius: radius.pill,
+    flexDirection: 'row',
     alignItems: 'center',
-    ...shadow.card,
+    justifyContent: 'center',
+    ...shadow.floating,
+  },
+  fabPlus: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '700',
+    marginRight: 8,
+    lineHeight: 22,
   },
   fabText: {
-    ...typography.label,
     color: '#FFFFFF',
-    fontSize: 15,
+    ...typography.subtitle,
+    fontSize: 16,
   },
 });

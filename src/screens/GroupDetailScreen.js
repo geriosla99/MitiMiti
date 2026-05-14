@@ -2,9 +2,10 @@
  * GroupDetailScreen
  *
  * Vista del grupo con:
- *  - Encabezado con total gastado y número de participantes.
- *  - Lista de gastos (tap para editar, long-press para eliminar).
- *  - Botón "Agregar gasto" + botón "Ver resumen final".
+ *  - Encabezado con total gastado, número de participantes y de gastos.
+ *  - Chips visuales con los nombres de los participantes.
+ *  - Lista de gastos (tap edita, long-press elimina).
+ *  - Botones flotantes: "Agregar gasto" y "Ver resumen final".
  */
 import React, { useCallback, useState } from 'react';
 import {
@@ -14,11 +15,13 @@ import {
   StyleSheet,
   Pressable,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ExpenseItem from '../components/ExpenseItem';
+import Avatar from '../components/Avatar';
 import {
   listParticipants,
   listExpenses,
@@ -52,11 +55,12 @@ export default function GroupDetailScreen({ route, navigation }) {
   );
 
   const total = expenses.reduce((acc, e) => acc + Number(e.amount), 0);
+  const perPerson = participants.length > 0 ? total / participants.length : 0;
 
   const confirmDeleteExpense = (expense) => {
     Alert.alert(
       'Eliminar gasto',
-      `¿Eliminar el gasto de ${formatCOP(expense.amount)}?`,
+      'Eliminar el gasto de ' + formatCOP(expense.amount) + '?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -80,11 +84,46 @@ export default function GroupDetailScreen({ route, navigation }) {
       <View style={styles.header}>
         <Text style={styles.headerLabel}>Total gastado</Text>
         <Text style={styles.headerAmount}>{formatCOP(total)}</Text>
-        <Text style={styles.headerSub}>
-          {participants.length} participante{participants.length === 1 ? '' : 's'} ·{' '}
-          {expenses.length} gasto{expenses.length === 1 ? '' : 's'}
-        </Text>
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{participants.length}</Text>
+            <Text style={styles.statLabel}>
+              {participants.length === 1 ? 'persona' : 'personas'}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{expenses.length}</Text>
+            <Text style={styles.statLabel}>
+              {expenses.length === 1 ? 'gasto' : 'gastos'}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{formatCOP(perPerson)}</Text>
+            <Text style={styles.statLabel}>c/u</Text>
+          </View>
+        </View>
       </View>
+
+      {participants.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsRow}
+        >
+          {participants.map((p) => (
+            <View key={p.id} style={styles.chip}>
+              <Avatar name={p.name} size={24} />
+              <Text style={styles.chipText} numberOfLines={1}>
+                {p.name}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
+
+      <Text style={styles.sectionTitle}>Gastos</Text>
 
       <FlatList
         data={expenses}
@@ -105,8 +144,10 @@ export default function GroupDetailScreen({ route, navigation }) {
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
+            <Text style={styles.emptyEmoji}>💸</Text>
+            <Text style={styles.emptyTitle}>Sin gastos todavía</Text>
             <Text style={styles.emptyText}>
-              Aún no hay gastos. Toca "Agregar gasto" para comenzar.
+              Toca "Agregar gasto" abajo para registrar el primer pago del viaje.
             </Text>
           </View>
         }
@@ -117,18 +158,22 @@ export default function GroupDetailScreen({ route, navigation }) {
           style={({ pressed }) => [
             styles.btn,
             styles.btnSecondary,
-            pressed && { opacity: 0.85 },
+            expenses.length === 0 && styles.btnDisabled,
+            pressed && expenses.length > 0 && { opacity: 0.85 },
           ]}
           onPress={() =>
-            navigation.navigate('Summary', {
-              groupId,
-              groupName,
-            })
+            navigation.navigate('Summary', { groupId, groupName })
           }
           disabled={expenses.length === 0}
         >
-          <Text style={[styles.btnText, { color: colors.primary }]}>
-            Ver resumen
+          <Text
+            style={[
+              styles.btnText,
+              { color: colors.primary },
+              expenses.length === 0 && { color: colors.textMuted },
+            ]}
+          >
+            📊 Resumen
           </Text>
         </Pressable>
 
@@ -136,7 +181,7 @@ export default function GroupDetailScreen({ route, navigation }) {
           style={({ pressed }) => [
             styles.btn,
             styles.btnPrimary,
-            pressed && { opacity: 0.85 },
+            pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] },
           ]}
           onPress={() =>
             navigation.navigate('AddExpense', { groupId, participants })
@@ -155,60 +200,117 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
   },
   headerLabel: {
-    ...typography.caption,
-    color: '#CCFBF1',
+    ...typography.micro,
+    color: '#D1FAE5',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   headerAmount: {
     color: '#FFFFFF',
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 36,
+    fontWeight: '800',
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
+    letterSpacing: -0.5,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.13)',
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+  },
+  statBox: { flex: 1, alignItems: 'center' },
+  statValue: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  statLabel: {
+    color: '#D1FAE5',
+    fontSize: 11,
+    marginTop: 2,
+    textTransform: 'lowercase',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     marginVertical: spacing.xs,
   },
-  headerSub: {
-    ...typography.caption,
-    color: '#CCFBF1',
+  chipsRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    marginRight: spacing.xs,
+    ...shadow.card,
+  },
+  chipText: {
+    ...typography.bodyStrong,
+    fontSize: 13,
+    color: colors.textPrimary,
+    marginLeft: -4,
+    maxWidth: 100,
+  },
+  sectionTitle: {
+    ...typography.label,
+    color: colors.textSecondary,
+    textTransform: 'uppercase',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
   },
   list: {
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 110,
     flexGrow: 1,
-    paddingBottom: 120,
   },
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 60,
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.xl,
+  },
+  emptyEmoji: { fontSize: 60, lineHeight: 76, marginBottom: spacing.md },
+  emptyTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
   emptyText: {
     ...typography.body,
     color: colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: spacing.xl,
+    lineHeight: 22,
   },
   footer: {
     flexDirection: 'row',
-    padding: spacing.lg,
+    padding: spacing.md,
     gap: spacing.sm,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   btn: {
     flex: 1,
     paddingVertical: spacing.md,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     alignItems: 'center',
-    ...shadow.card,
   },
-  btnPrimary: { backgroundColor: colors.primary },
+  btnPrimary: { backgroundColor: colors.primary, ...shadow.floating, flex: 1.4 },
   btnSecondary: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primarySofter,
     borderWidth: 1,
     borderColor: colors.primary,
   },
-  btnText: { ...typography.label, fontSize: 14 },
+  btnDisabled: {
+    backgroundColor: colors.surfaceAlt,
+    borderColor: colors.border,
+  },
+  btnText: { ...typography.bodyStrong, fontSize: 14 },
 });

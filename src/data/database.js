@@ -9,11 +9,7 @@
  *   groups        (id, name, created_at)
  *   participants  (id, group_id, name)
  *   expenses      (id, group_id, payer_id, amount, description, created_at)
- *
- * En esta primera versión el gasto se divide a partes iguales entre TODOS
- * los participantes del grupo, así que no necesitamos una tabla de
- * "shares". Si en el futuro queremos permitir splits desiguales, basta con
- * añadir una tabla expense_shares (expense_id, participant_id, weight).
+ *   app_settings  (key, value)            -- preferencias simples
  */
 import * as SQLite from 'expo-sqlite';
 
@@ -45,7 +41,6 @@ export async function execute(sql, params = []) {
   if (typeof db.runAsync === 'function') {
     return db.runAsync(sql, params);
   }
-  // Fallback para la API clásica basada en transacciones.
   return new Promise((resolve, reject) => {
     db.transaction(
       (tx) => {
@@ -94,7 +89,6 @@ export async function query(sql, params = []) {
  * Crea las tablas si no existen. Idempotente — se puede llamar en cada arranque.
  */
 export async function initDatabase() {
-  // Activamos foreign keys (SQLite las desactiva por defecto).
   await execute('PRAGMA foreign_keys = ON;');
 
   await execute(`
@@ -127,7 +121,13 @@ export async function initDatabase() {
     );
   `);
 
-  // Índices para acelerar los listados frecuentes.
+  await execute(`
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key    TEXT PRIMARY KEY,
+      value  TEXT
+    );
+  `);
+
   await execute(
     `CREATE INDEX IF NOT EXISTS idx_participants_group ON participants(group_id);`
   );
@@ -143,5 +143,6 @@ export async function resetDatabase() {
   await execute('DROP TABLE IF EXISTS expenses;');
   await execute('DROP TABLE IF EXISTS participants;');
   await execute('DROP TABLE IF EXISTS groups;');
+  await execute('DROP TABLE IF EXISTS app_settings;');
   await initDatabase();
 }

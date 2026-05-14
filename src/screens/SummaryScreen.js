@@ -2,10 +2,10 @@
  * SummaryScreen
  *
  * Resumen final del grupo:
- *  1. Tarjeta con el total y la cuota por persona.
- *  2. Tabla de balances (cuánto pagó cada uno y cuánto debía pagar).
+ *  1. Tarjeta hero con el total y la cuota por persona.
+ *  2. Tabla de balances (con pill de estado: "Le deben" / "Debe" / "Al día").
  *  3. Gráfico simple de barras (cuánto pagó cada persona).
- *  4. Lista de transferencias mínimas: "Ana le debe $20 a Juan".
+ *  4. Lista de transferencias mínimas: "Ana le debe $20.000 a Juan".
  *
  * La lógica vive en src/logic/calculations.js — esta pantalla solo orquesta.
  */
@@ -63,18 +63,23 @@ export default function SummaryScreen({ route }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* ── Resumen general ─────────────────────────────────── */}
-      <View style={styles.totalCard}>
-        <Text style={styles.totalLabel}>Total del viaje</Text>
-        <Text style={styles.totalAmount}>{formatCOP(summary.total)}</Text>
-        <View style={styles.divider} />
-        <View style={styles.totalRow}>
-          <Text style={styles.totalRowLabel}>Cuota por persona</Text>
-          <Text style={styles.totalRowValue}>{formatCOP(summary.perPerson)}</Text>
-        </View>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalRowLabel}>Participantes</Text>
-          <Text style={styles.totalRowValue}>{summary.balances.length}</Text>
+      {/* ── Hero card ───────────────────────────────────────── */}
+      <View style={styles.heroCard}>
+        <Text style={styles.heroLabel}>Total del viaje</Text>
+        <Text style={styles.heroAmount}>{formatCOP(summary.total)}</Text>
+        <View style={styles.heroDivider} />
+        <View style={styles.heroRow}>
+          <View style={styles.heroStatBox}>
+            <Text style={styles.heroStatLabel}>Cuota por persona</Text>
+            <Text style={styles.heroStatValue}>
+              {formatCOP(summary.perPerson)}
+            </Text>
+          </View>
+          <View style={styles.heroVerticalDivider} />
+          <View style={styles.heroStatBox}>
+            <Text style={styles.heroStatLabel}>Personas</Text>
+            <Text style={styles.heroStatValue}>{summary.balances.length}</Text>
+          </View>
         </View>
       </View>
 
@@ -83,18 +88,22 @@ export default function SummaryScreen({ route }) {
       <View style={styles.card}>
         {summary.balances.map((b, idx) => {
           const isLast = idx === summary.balances.length - 1;
-          // > 0 → debe recibir; < 0 → debe pagar; ≈ 0 → al día
-          let statusText;
-          let statusColor;
+          let pillText, pillBg, pillColor, pillIcon;
           if (Math.abs(b.balance) < 0.01) {
-            statusText = 'Al día';
-            statusColor = colors.textMuted;
+            pillText = 'Al día';
+            pillBg = colors.surfaceAlt;
+            pillColor = colors.textSecondary;
+            pillIcon = '✓';
           } else if (b.balance > 0) {
-            statusText = `Le deben ${formatCOP(b.balance)}`;
-            statusColor = colors.success;
+            pillText = `+${formatCOP(b.balance)}`;
+            pillBg = colors.successSoft;
+            pillColor = colors.success;
+            pillIcon = '↑';
           } else {
-            statusText = `Debe ${formatCOP(-b.balance)}`;
-            statusColor = colors.danger;
+            pillText = `−${formatCOP(-b.balance)}`;
+            pillBg = colors.dangerSoft;
+            pillColor = colors.danger;
+            pillIcon = '↓';
           }
 
           return (
@@ -102,20 +111,29 @@ export default function SummaryScreen({ route }) {
               key={b.id}
               style={[styles.balanceRow, isLast && { borderBottomWidth: 0 }]}
             >
-              <Avatar name={b.name} size={36} />
+              <Avatar name={b.name} size={40} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.balanceName}>{b.name}</Text>
                 <Text style={styles.balanceMeta}>
                   Pagó {formatCOP(b.paid)} · Le tocaba {formatCOP(b.share)}
                 </Text>
               </View>
-              <Text style={[styles.balanceStatus, { color: statusColor }]}>
-                {statusText}
-              </Text>
+              <View style={[styles.pill, { backgroundColor: pillBg }]}>
+                <Text style={[styles.pillIcon, { color: pillColor }]}>
+                  {pillIcon}
+                </Text>
+                <Text style={[styles.pillText, { color: pillColor }]}>
+                  {pillText}
+                </Text>
+              </View>
             </View>
           );
         })}
       </View>
+
+      <Text style={styles.sectionHint}>
+        ↑ verde = le deben dinero · ↓ rojo = debe pagar
+      </Text>
 
       {/* ── Gráfico ────────────────────────────────────────── */}
       <Text style={styles.sectionTitle}>Distribución de pagos</Text>
@@ -125,6 +143,7 @@ export default function SummaryScreen({ route }) {
       <Text style={styles.sectionTitle}>¿Quién le paga a quién?</Text>
       {summary.settlements.length === 0 ? (
         <View style={[styles.card, styles.allClearCard]}>
+          <Text style={styles.allClearEmoji}>🎉</Text>
           <Text style={styles.allClearTitle}>¡Todos al día!</Text>
           <Text style={styles.allClearText}>
             Nadie le debe dinero a nadie en este grupo.
@@ -137,24 +156,41 @@ export default function SummaryScreen({ route }) {
               key={`${s.fromId}-${s.toId}-${idx}`}
               style={[
                 styles.settlementRow,
-                idx === summary.settlements.length - 1 && { borderBottomWidth: 0 },
+                idx === summary.settlements.length - 1 && {
+                  borderBottomWidth: 0,
+                },
               ]}
             >
-              <View style={styles.settlementText}>
-                <Text style={styles.settlementName}>{s.fromName}</Text>
-                <Text style={styles.settlementAction}>
-                  {' '}le debe{' '}
-                </Text>
-                <Text style={styles.settlementAmount}>{formatCOP(s.amount)}</Text>
-                <Text style={styles.settlementAction}> a </Text>
-                <Text style={styles.settlementName}>{s.toName}</Text>
+              <View style={styles.settlementParties}>
+                <View style={styles.settlementSide}>
+                  <Avatar name={s.fromName} size={32} />
+                  <Text style={styles.settlementName} numberOfLines={1}>
+                    {s.fromName}
+                  </Text>
+                </View>
+                <View style={styles.settlementMiddle}>
+                  <Text style={styles.settlementArrow}>→</Text>
+                  <Text style={styles.settlementAmount}>
+                    {formatCOP(s.amount)}
+                  </Text>
+                </View>
+                <View style={styles.settlementSide}>
+                  <Avatar name={s.toName} size={32} />
+                  <Text style={styles.settlementName} numberOfLines={1}>
+                    {s.toName}
+                  </Text>
+                </View>
               </View>
+              <Text style={styles.settlementText}>
+                <Text style={styles.settlementBold}>{s.fromName}</Text> le debe a{' '}
+                <Text style={styles.settlementBold}>{s.toName}</Text>
+              </Text>
             </View>
           ))}
         </View>
       )}
 
-      <View style={{ height: spacing.xl }} />
+      <View style={{ height: spacing.xxl }} />
     </ScrollView>
   );
 }
@@ -167,51 +203,63 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   container: { padding: spacing.lg },
-  totalCard: {
+
+  heroCard: {
     backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
     marginBottom: spacing.lg,
-    ...shadow.card,
+    ...shadow.cardLg,
   },
-  totalLabel: {
-    ...typography.caption,
-    color: '#CCFBF1',
+  heroLabel: {
+    ...typography.micro,
+    color: '#D1FAE5',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
-  totalAmount: {
+  heroAmount: {
     color: '#FFFFFF',
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 40,
+    fontWeight: '800',
     marginVertical: spacing.xs,
+    letterSpacing: -1,
   },
-  divider: {
+  heroDivider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.2)',
-    marginVertical: spacing.sm,
+    marginVertical: spacing.md,
   },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
+  heroRow: { flexDirection: 'row' },
+  heroStatBox: { flex: 1 },
+  heroStatLabel: { ...typography.caption, color: '#D1FAE5' },
+  heroStatValue: {
+    ...typography.subtitle,
+    color: '#FFFFFF',
+    marginTop: 2,
   },
-  totalRowLabel: { ...typography.body, color: '#CCFBF1' },
-  totalRowValue: { ...typography.label, color: '#FFFFFF' },
+  heroVerticalDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginHorizontal: spacing.md,
+  },
 
   sectionTitle: {
     ...typography.label,
     color: colors.textSecondary,
+    marginTop: spacing.md,
     marginBottom: spacing.sm,
-    marginTop: spacing.sm,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  },
+  sectionHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xs,
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+    marginBottom: spacing.xs,
     ...shadow.card,
   },
   balanceRow: {
@@ -221,12 +269,41 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  balanceName: { ...typography.label, color: colors.textPrimary, fontSize: 14 },
-  balanceMeta: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  balanceStatus: { ...typography.label, fontSize: 13, marginLeft: spacing.sm },
+  balanceName: {
+    ...typography.bodyStrong,
+    color: colors.textPrimary,
+    fontSize: 15,
+  },
+  balanceMeta: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    marginLeft: spacing.sm,
+  },
+  pillIcon: { fontSize: 12, fontWeight: '800', marginRight: 3 },
+  pillText: { ...typography.label, fontSize: 12 },
 
-  allClearCard: { padding: spacing.lg, alignItems: 'center' },
-  allClearTitle: { ...typography.subtitle, color: colors.success },
+  allClearCard: {
+    padding: spacing.xl,
+    alignItems: 'center',
+  },
+  allClearEmoji: {
+    fontSize: 56,
+    lineHeight: 72,
+    marginBottom: spacing.sm,
+  },
+  allClearTitle: {
+    ...typography.subtitle,
+    color: colors.success,
+    fontSize: 20,
+  },
   allClearText: {
     ...typography.body,
     color: colors.textSecondary,
@@ -239,8 +316,46 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  settlementText: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' },
-  settlementName: { ...typography.label, color: colors.textPrimary, fontSize: 15 },
-  settlementAction: { ...typography.body, color: colors.textSecondary },
-  settlementAmount: { ...typography.label, color: colors.primary, fontSize: 15 },
+  settlementParties: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  settlementSide: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  settlementName: {
+    ...typography.bodyStrong,
+    color: colors.textPrimary,
+    fontSize: 14,
+    marginLeft: -4,
+    flexShrink: 1,
+  },
+  settlementMiddle: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  settlementArrow: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  settlementAmount: {
+    ...typography.label,
+    color: colors.primary,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  settlementText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    paddingHorizontal: spacing.sm,
+  },
+  settlementBold: {
+    ...typography.bodyStrong,
+    fontSize: 13,
+    color: colors.textPrimary,
+  },
 });

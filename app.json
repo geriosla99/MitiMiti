@@ -1,24 +1,38 @@
 {
   "expo": {
-    "name": "Divisor de Gastos",
-    "slug": "divisor-gastos",
+    "name": "Mitimiti",
+    "slug": "mitimiti",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "icon": "./assets/logo.png",
     "splash": {
-      "backgroundColor": "#0F766E",
+      "image": "./assets/logo.png",
+      "backgroundColor": "#FAF6EB",
       "resizeMode": "contain"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.divisorgastos.app"
+      "bundleIdentifier": "com.mitimiti.app"
     },
     "android": {
-      "package": "com.divisorgastos.app",
+      "package": "com.mitimiti.app",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#0F766E"
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#FAF6EB"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "73bfd4b3-577d-46ff-8081-4964efc869bc"
       }
     }
   }
