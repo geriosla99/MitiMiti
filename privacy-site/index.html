@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidad — Mitimiti</title>
+  <meta name="description" content="Política de privacidad de Mitimiti: divide gastos en viajes y salidas grupales. 100% privado, sin recolección de datos." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤝</text></svg>" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-deep: #047857;
+      --primary-soft: #D1FAE5;
+      --primary-softer: #ECFDF5;
+      --accent: #7C3AED;
+      --accent-soft: #EDE9FE;
+      --bg: #FAF6EB;
+      --surface: #FFFFFF;
+      --border: #E8E2D2;
+      --text-primary: #0F1628;
+      --text-secondary: #4B5563;
+      --text-muted: #9CA3AF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      padding: 64px 24px 48px;
+      text-align: center;
+      color: white;
+    }
+
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .header-logo-icon {
+      width: 56px;
+      height: 56px;
+      background: white;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .header h1 .miti-1 { color: #D1FAE5; }
+    .header h1 .miti-2 { color: #EDE9FE; }
+
+    .header-subtitle {
+      font-size: 18px;
+      opacity: 0.95;
+      margin-top: 8px;
+    }
+
+    .last-update {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Container ─────────────────────────────────── */
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    /* ── Resumen destacado ─────────────────────────── */
+    .summary-card {
+      background: var(--primary-softer);
+      border-left: 4px solid var(--primary);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 48px;
+      box-shadow: 0 2px 8px rgba(15, 22, 40, 0.04);
+    }
+
+    .summary-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-deep);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .summary-card p {
+      color: var(--text-primary);
+      font-size: 15px;
+    }
+
+    /* ── Secciones ─────────────────────────────────── */
+    .section {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(15, 22, 40, 0.04);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-number {
+      width: 32px;
+      height: 32px;
+      background: var(--primary-soft);
+      color: var(--primary-deep);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .section p {
+      color: var(--text-primary);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .section p:last-child { margin-bottom: 0; }
+
+    .section ul {
+      margin: 12px 0;
+      padding-left: 24px;
+      color: var(--text-primary);
+    }
+
+    .section li {
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .section strong {
+      color: var(--primary-deep);
+    }
+
+    /* ── Email destacado ───────────────────────────── */
+    .contact-email {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 16px;
+      margin-top: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .contact-email:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 32px 24px 48px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .footer-brand {
+      color: var(--primary-deep);
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 600px) {
+      .header { padding: 48px 20px 40px; }
+      .header h1 { font-size: 28px; }
+      .header-subtitle { font-size: 16px; }
+      .header-logo-icon { width: 48px; height: 48px; font-size: 28px; }
+      .container { padding: 32px 16px; }
+      .section { padding: 24px 20px; }
+      .summary-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header con branding -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="header-logo-icon">🤝</div>
+      <h1><span class="miti-1">miti</span><span class="miti-2">miti</span></h1>
+    </div>
+    <p class="header-subtitle">Política de Privacidad</p>
+    <span class="last-update">Última actualización: 6 de mayo de 2026</span>
+  </header>
+
+  <main class="container">
+
+    <!-- Resumen destacado -->
+    <div class="summary-card">
+      <div class="summary-card-title">
+        <span>🔒</span>
+        <span>Resumen rápido</span>
+      </div>
+      <p>
+        Mitimiti <strong>no recolecta, almacena ni transmite información personal</strong> a servidores externos.
+        Toda la información que ingresas (nombres, gastos, descripciones) se guarda exclusivamente en la base de datos local de tu dispositivo.
+        No requerimos registro, login, número de teléfono ni correo electrónico para usar la app.
+      </p>
+    </div>
+
+    <!-- Sección 1: Información introductoria -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Sobre esta política</h2>
+      </div>
+      <p>
+        Esta Política de Privacidad describe cómo la aplicación móvil <strong>Mitimiti</strong> ("la app", "nosotros") trata la información cuando es utilizada por usted ("el usuario", "usted"). Al usar Mitimiti, usted acepta los términos descritos en esta política.
+      </p>
+    </section>
+
+    <!-- Sección 2: Información que maneja -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Información que la app maneja</h2>
+      </div>
+      <p>Mitimiti almacena localmente, en su dispositivo, los siguientes datos que usted ingresa voluntariamente:</p>
+      <ul>
+        <li>Nombres de los grupos de viaje que crea.</li>
+        <li>Nombres de los participantes que agrega a cada grupo.</li>
+        <li>Montos, fechas y descripciones de los gastos que registra.</li>
+        <li>Una marca interna que indica si ya vio el tutorial de bienvenida.</li>
+      </ul>
+      <p>
+        Estos datos <strong>no salen de su dispositivo</strong>. No se envían a ningún servidor, no se sincronizan, no se respaldan en la nube y no son visibles para nadie más.
+      </p>
+    </section>
+
+    <!-- Sección 3: Permisos -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Permisos del dispositivo</h2>
+      </div>
+      <p>Mitimiti <strong>no solicita permisos sensibles</strong>. La app no accede a:</p>
+      <ul>
+        <li>Contactos</li>
+        <li>Cámara o galería</li>
+        <li>Ubicación</li>
+        <li>Micrófono</li>
+        <li>Notificaciones push</li>
+        <li>Almacenamiento externo</li>
+      </ul>
+      <p>
+        El único almacenamiento que utiliza es la base de datos interna de la propia aplicación, que se elimina automáticamente si usted desinstala Mitimiti.
+      </p>
+    </section>
+
+    <!-- Sección 4: Terceros -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Compartir información con terceros</h2>
+      </div>
+      <p>
+        Mitimiti <strong>no comparte información con terceros</strong>. No utilizamos servicios de analítica, publicidad, rastreo ni ninguna integración que envíe sus datos fuera del dispositivo.
+      </p>
+    </section>
+
+    <!-- Sección 5: Menores -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Información de menores</h2>
+      </div>
+      <p>
+        Mitimiti no está dirigida específicamente a menores de 13 años. Como la app no recolecta datos personales, no recolectamos información de menores ni de ningún otro grupo demográfico.
+      </p>
+    </section>
+
+    <!-- Sección 6: Seguridad -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Seguridad de los datos</h2>
+      </div>
+      <p>
+        Como toda la información reside en su dispositivo, su seguridad depende de las medidas que usted tome (contraseña del teléfono, biometría, cifrado del sistema operativo). Recomendamos mantener su dispositivo actualizado y protegido.
+      </p>
+    </section>
+
+    <!-- Sección 7: Eliminación -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>Eliminación de datos</h2>
+      </div>
+      <p>
+        Para eliminar todos sus datos de Mitimiti, simplemente <strong>desinstale la aplicación</strong> desde su dispositivo. Esto borrará permanentemente la base de datos local. No es necesario contactarnos para solicitar la eliminación.
+      </p>
+    </section>
+
+    <!-- Sección 8: Cambios -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Cambios a esta política</h2>
+      </div>
+      <p>
+        Podemos actualizar esta Política de Privacidad ocasionalmente para reflejar cambios en la app o en los requisitos legales. La fecha de "Última actualización" en la parte superior indica cuándo se hizo el último cambio. Los cambios significativos se anunciarán dentro de la propia aplicación.
+      </p>
+    </section>
+
+    <!-- Sección 9: Cumplimiento legal -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">9</div>
+        <h2>Cumplimiento legal</h2>
+      </div>
+      <p>Mitimiti se diseñó respetando los principios de:</p>
+      <ul>
+        <li><strong>Reglamento General de Protección de Datos (RGPD/GDPR)</strong> de la Unión Europea.</li>
+        <li><strong>Ley 1581 de 2012 (Colombia)</strong> de protección de datos personales.</li>
+        <li><strong>California Consumer Privacy Act (CCPA)</strong> de Estados Unidos.</li>
+      </ul>
+      <p>
+        Como no recolectamos datos personales, no aplican la mayoría de obligaciones de estas regulaciones, pero adoptamos sus principios como buena práctica.
+      </p>
+    </section>
+
+    <!-- Sección 10: Contacto -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <h2>Contacto</h2>
+      </div>
+      <p>
+        Si tiene preguntas, comentarios o inquietudes sobre esta Política de Privacidad o sobre el manejo de datos en Mitimiti, escríbanos a:
+      </p>
+      <p>
+        <a class="contact-email" href="mailto:soporte.mitimiti@gmail.com">📧 soporte.mitimiti@gmail.com</a>
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span class="footer-brand">Mitimiti</span> — Divide gastos, suma momentos.
+  </footer>
+
+</body>
+</html>

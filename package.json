@@ -1,5 +1,5 @@
 {
-  "name": "divisor-gastos-app",
+  "name": "MitiMiti",
   "version": "1.0.0",
   "description": "App móvil para dividir gastos en viajes o salidas grupales (React Native + Expo)",
   "main": "node_modules/expo/AppEntry.js",
